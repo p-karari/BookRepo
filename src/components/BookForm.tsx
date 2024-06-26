@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import {Book} from '../hooks/bookReducer'
-// import './book.scss'
+import './bookform.scss'
 
 
 function BookForm({ onAddBook }: { onAddBook: (book: Book) => void }) {
@@ -17,14 +17,17 @@ function BookForm({ onAddBook }: { onAddBook: (book: Book) => void }) {
       year: yearRef.current?.value || '',
     };
     onAddBook(newBook);
+    titleRef.current!.value = '';
+    authorRef.current!.value = '';
+    yearRef.current!.value = '';
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <input type="text" placeholder="Title" ref={titleRef} required />
+      <input type="text" placeholder="Title" ref={titleRef} required /> 
       <input type="text" placeholder="Author" ref={authorRef} required />
       <input type="text" placeholder="Publication Year" ref={yearRef} required />
-      <button type="submit">Add Book</button>
+      <button className='add' type="submit">Add Book</button>
     </form>
   );
 }
