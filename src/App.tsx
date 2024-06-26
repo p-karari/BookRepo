@@ -1,20 +1,13 @@
-import{ useReducer, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import useLocalStorage from '../src/hooks/useLocalStorage';
 import BookForm from '../src/components/BookForm';
 import BookList from '../src/components/bookList';
-import {Book, bookReducer} from '../src/hooks/bookReducer'
-
+import { Book } from '../src/hooks/bookReducer';
+import './App.scss';
 function App() {
   const [books, setBooks] = useLocalStorage<Book[]>('books', []);
   const [filteredBooks, setFilteredBooks] = useState<Book[]>(books);
   const [searchQuery, setSearchQuery] = useState<string>('');
-
-  const [state, dispatch] = useReducer(bookReducer, books);
-
-  useEffect(() => {
-    setBooks(state);
-    setFilteredBooks(state);
-  }, [state, setBooks]);
 
   useEffect(() => {
     setFilteredBooks(
@@ -25,26 +18,35 @@ function App() {
   }, [searchQuery, books]);
 
   const handleAddBook = (book: Book) => {
-    dispatch({ type: 'add', book });
+    setBooks([...books, book]);
   };
 
   const handleUpdateBook = (book: Book) => {
-    dispatch({ type: 'update', book });
+    const updatedBooks = books.map((b) => (b.id === book.id ? book : b));
+    setBooks(updatedBooks);
   };
 
   const handleDeleteBook = (id: number) => {
-    dispatch({ type: 'delete', id });
+    const updatedBooks = books.filter((b) => b.id !== id);
+    setBooks(updatedBooks);
   };
 
   return (
-    <div>
+    <div className="app">
       <h1>Book Repository</h1>
-      <input
-        type="text"
-        placeholder="Search by title"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-      />
+      <span className="search-container">
+        <input
+          type="text"
+          placeholder="Search by title"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <button onClick={() => setFilteredBooks(
+          books.filter((book) =>
+            book.title.toLowerCase().includes(searchQuery.toLowerCase())
+          )
+        )}>Search</button>
+      </span>
       <BookForm onAddBook={handleAddBook} />
       <BookList
         books={filteredBooks}
@@ -56,3 +58,4 @@ function App() {
 }
 
 export default App;
+
