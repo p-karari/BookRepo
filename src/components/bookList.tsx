@@ -1,6 +1,6 @@
 import { useCallback, useState, useRef } from 'react';
 import { Book } from '../hooks/bookReducer';
-import './BookList.scss';
+import './booklist.scss';
 
 function BookList({ books, onDeleteBook, onUpdateBook }: { books: Book[]; onDeleteBook: (id: number) => void; onUpdateBook: (book: Book) => void }) {
   const [currentPage, setCurrentPage] = useState(1);
