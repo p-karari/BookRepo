@@ -11,10 +11,10 @@ function BookForm({ onAddBook }: { onAddBook: (book: Book) => void }) {
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     const newBook = {
-      id: Date.now(),
+      id:0,
       title: titleRef.current?.value || '',
       author: authorRef.current?.value || '',
-      year: yearRef.current?.value || '',
+      year: Number(yearRef.current?.value || ''),
     };
     onAddBook(newBook);
     titleRef.current!.value = '';
