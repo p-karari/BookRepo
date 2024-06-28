@@ -1,6 +1,7 @@
 import { useCallback, useState, useRef } from 'react';
-import { Book } from '../hooks/bookReducer';
+import { Book } from '../type';
 import './booklist.scss';
+import axios from 'axios';
 
 function BookList({ books, onDeleteBook, onUpdateBook }: { books: Book[]; onDeleteBook: (id: number) => void; onUpdateBook: (book: Book) => void }) {
   const [currentPage, setCurrentPage] = useState(1);
@@ -23,23 +24,33 @@ function BookList({ books, onDeleteBook, onUpdateBook }: { books: Book[]; onDele
     setEditIndex(index);
   };
 
-  const handleSave = (book: Book) => {
-    const updatedBook = {
-      ...book,
-      title: titleRef.current?.value || book.title,
-      author: authorRef.current?.value || book.author,
-      year: yearRef.current?.value || book.year
-    };
-    onUpdateBook(updatedBook);
-    setEditIndex(null);
+  const handleSave = async (book: Book) => {
+    try {
+      const updatedBook = {
+        ...book,
+        title: titleRef.current?.value || book.title,
+        author: authorRef.current?.value || book.author,
+        year: Number(yearRef.current?.value || book.year)
+      };
+      await axios.put(`http://localhost:8000/books/${book.id}`, updatedBook);
+      onUpdateBook(updatedBook);
+      setEditIndex(null);
+    } catch (error) {
+      console.error('Error updating book:', error);
+    }
   };
 
-  const handleDelete = (id: number) => {
-    onDeleteBook(id);
+  const handleDelete = async (id: number) => {
+    try {
+      await axios.delete(`http://localhost:8000/books/${id}`);
+      onDeleteBook(id);
+    } catch (error) {
+      console.error('Error deleting book:', error);
+    }
   };
 
   const startIndex = (currentPage - 1) * booksPerPage;
-  const selectedBooks = books.slice(startIndex, startIndex + booksPerPage);
+  const selectedBooks = books.filter((_, index) => index >= startIndex && index < startIndex + booksPerPage);
 
   return (
     <div>
@@ -71,7 +82,7 @@ function BookList({ books, onDeleteBook, onUpdateBook }: { books: Book[]; onDele
               </td>
               <td>
                 {editIndex === index ? (
-                  <input type="text" defaultValue={book.year} ref={yearRef} />
+                  <input type="number" defaultValue={book.year} ref={yearRef} />
                 ) : (
                   book.year
                 )}
@@ -103,3 +114,4 @@ function BookList({ books, onDeleteBook, onUpdateBook }: { books: Book[]; onDele
 }
 
 export default BookList;
+
